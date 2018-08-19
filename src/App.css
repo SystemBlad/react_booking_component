@@ -94,3 +94,16 @@
 .react-autosuggest__suggestion--highlighted {
   background-color: #ddd;
 }
+
+.form-inline .form-group {
+  display: block;
+}
+
+.form-group {
+  padding: 10px;
+  width: 160px;
+}
+
+.form-inline .form-control {
+  width: 100%;
+}

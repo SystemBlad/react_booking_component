@@ -1,102 +1,14 @@
 import React, {Component} from 'react';
-import {Button, Form, FormGroup, Label, Input, FormText} from 'reactstrap';
 import '../react-datetime/react-datetime.css';
-import Datetime from 'react-datetime';
 import Autosuggest from 'react-autosuggest';
 
-
-const languages = [
-    {
-        name: 'C',
-        year: 1972
-    },
-    {
-        name: 'C#',
-        year: 2000
-    },
-    {
-        name: 'C++',
-        year: 1983
-    },
-    {
-        name: 'Clojure',
-        year: 2007
-    },
-    {
-        name: 'Elm',
-        year: 2012
-    },
-    {
-        name: 'Go',
-        year: 2009
-    },
-    {
-        name: 'Haskell',
-        year: 1990
-    },
-    {
-        name: 'Java',
-        year: 1995
-    },
-    {
-        name: 'Javascript',
-        year: 1995
-    },
-    {
-        name: 'Perl',
-        year: 1987
-    },
-    {
-        name: 'PHP',
-        year: 1995
-    },
-    {
-        name: 'Python',
-        year: 1991
-    },
-    {
-        name: 'Ruby',
-        year: 1995
-    },
-    {
-        name: 'Scala',
-        year: 2003
-    }
-];
-
-function getMatchingLanguages(value) {
-    const escapedValue = escapeRegexCharacters(value.trim());
-
-    if (escapedValue === '') {
-        return [];
-    }
-
-    const regex = new RegExp('^' + escapedValue, 'i');
-
-    return languages.filter(language => regex.test(language.name));
-}
-
-/* ----------- */
-/*    Utils    */
-/* ----------- */
-
-// https://developer.mozilla.org/en/docs/Web/JavaScript/Guide/Regular_Expressions#Using_Special_Characters
 function escapeRegexCharacters(str) {
     return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
 
-/* --------------- */
-/*    Component    */
-
-/* --------------- */
-
-function getSuggestionValue(suggestion) {
-    return suggestion.name;
-}
-
 function renderSuggestion(suggestion) {
     return (
-        <span>{suggestion.name}</span>
+        <span>{suggestion.name} ({suggestion.code})</span>
     );
 }
 
@@ -123,16 +35,30 @@ class IataCodeInput extends Component {
             isLoading: true
         });
 
-        // Fake request
-        this.lastRequestId = setTimeout(() => {
-            this.setState({
-                isLoading: false,
-                suggestions: getMatchingLanguages(value)
+        const escapedValue = escapeRegexCharacters(value.trim());
+
+        if (escapedValue === '') {
+            return [];
+        }
+
+        const regex = new RegExp('^' + escapedValue, 'i');
+
+        fetch('/cities.json')
+            .then((response) => response.json())
+            .then((findresponse) => {
+                this.setState({
+                    isLoading: false,
+                    suggestions: findresponse.response.filter(item => regex.test(item.name))
+                });
             });
-        }, 1000);
+
+
     }
 
-    onChange = (event, {newValue}) => {
+    onChange = (event, {newValue, method}) => {
+        if (method === "type") {
+            this.props.onUpdate(null);
+        }
         this.setState({
             value: newValue
         });
@@ -140,6 +66,12 @@ class IataCodeInput extends Component {
 
     onSuggestionsFetchRequested = ({value}) => {
         this.loadSuggestions(value);
+    };
+
+    getSuggestionValue(suggestion) {
+        console.log(suggestion);
+        this.props.onUpdate(suggestion);
+        return suggestion.name + " (" + suggestion.code + ")";
     };
 
     onSuggestionsClearRequested = () => {
@@ -151,13 +83,12 @@ class IataCodeInput extends Component {
     render() {
 
         const {value, suggestions, isLoading} = this.state;
-        const status = (isLoading ? 'Loading...' : 'Type to load suggestions');
         const inputProps = {
-            placeholder: "From",
             value,
-            onChange: this.onChange
+            onChange: this.onChange,
+            type: 'search',
+            placeholder: 'Enter a city',
         };
-
 
         return (
 
@@ -165,7 +96,7 @@ class IataCodeInput extends Component {
                          suggestions={suggestions}
                          onSuggestionsFetchRequested={this.onSuggestionsFetchRequested}
                          onSuggestionsClearRequested={this.onSuggestionsClearRequested}
-                         getSuggestionValue={getSuggestionValue}
+                         getSuggestionValue={this.getSuggestionValue.bind(this)}
                          renderSuggestion={renderSuggestion}
                          inputProps={inputProps}/>
 
