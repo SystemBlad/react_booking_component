@@ -69,7 +69,6 @@ class IataCodeInput extends Component {
     };
 
     getSuggestionValue(suggestion) {
-        console.log(suggestion);
         this.props.onUpdate(suggestion);
         return suggestion.name + " (" + suggestion.code + ")";
     };
@@ -82,7 +81,7 @@ class IataCodeInput extends Component {
 
     render() {
 
-        const {value, suggestions, isLoading} = this.state;
+        const {value, suggestions} = this.state;
         const inputProps = {
             value,
             onChange: this.onChange,

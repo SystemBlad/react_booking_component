@@ -1,5 +1,4 @@
 import React, {Component} from 'react';
-//import {Button, Form, FormGroup, Label, Input, Dropdown, DropdownToggle, DropdownMenu, DropdownItem} from 'reactstrap';
 import '../react-datetime/react-datetime.css';
 import IataCodeInput from '../iata-code-input/IataCodeInput';
 import Datetime from 'react-datetime';
@@ -29,12 +28,9 @@ class BookingMask extends Component {
         if ((!this.state.adults && !this.state.children && !this.state.infants) || !this.state.fromCity || !this.state.toCity) {
             alert('Please, enter valid data');
         } else {
-            //window.location = 'https://www.swiss.com/us/en/Book/Outbound/MIA-MAD/from-2017-12-05/adults-1/children-0/infants-0/class-economy/al-LX/sidmbvl'
-            //let urlToSend = "https://www.swiss.com/us/en/Book/flight_type/origin-destination/from-departure_date in YYYY-MM-DD format/adults-adult_amount/children-children_amount/infants-infants_amount/class-flight_class/al-LX/sidmbvl";
             let urlToSend = "https://www.swiss.com/us/en/Book/Outbound/" + this.state.fromCity.code + "-" + this.state.toCity.code +
                 "/from-" + this.state.departureDate.format("YYYY-MM-DD") + "/adults-" + this.state.adults +
                 "/children-" + this.state.children + "/infants-" + this.state.infants + "/class-economy/al-LX/sidmbvl'";
-            console.log(urlToSend);
             this.props.saveBookingURL( urlToSend );
             event.preventDefault();
         }
