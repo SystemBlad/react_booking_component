@@ -43,7 +43,7 @@ class IataCodeInput extends Component {
 
         const regex = new RegExp('^' + escapedValue, 'i');
 
-        fetch('/cities.json')
+        fetch(process.env.PUBLIC_URL + '/cities.json')
             .then((response) => response.json())
             .then((findresponse) => {
                 this.setState({
